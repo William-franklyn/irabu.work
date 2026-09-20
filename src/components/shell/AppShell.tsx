@@ -20,6 +20,7 @@ export function AppShell({
   role,
   viewingAs,
   memberships,
+  canManageAgents,
   children,
 }: {
   orgId: string;
@@ -28,6 +29,7 @@ export function AppShell({
   role: "owner" | "admin" | "member";
   viewingAs: boolean;
   memberships: WorkspaceMembership[];
+  canManageAgents: boolean;
   children: React.ReactNode;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -40,6 +42,7 @@ export function AppShell({
           orgId={orgId}
           orgName={orgName}
           memberships={memberships}
+          canManageAgents={canManageAgents}
           mobileOpen={mobileNavOpen}
           onCloseMobile={() => setMobileNavOpen(false)}
         />

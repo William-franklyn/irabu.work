@@ -7,7 +7,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { orgId, orgName, fullName, role, viewingAs, memberships } = await requireAuth();
+  const { orgId, orgName, fullName, role, viewingAs, memberships, canManageAgents } = await requireAuth();
 
   return (
     <CommandPaletteProvider>
@@ -18,6 +18,7 @@ export default async function AppLayout({
         role={role}
         viewingAs={viewingAs}
         memberships={memberships}
+        canManageAgents={canManageAgents}
       >
         {children}
       </AppShell>

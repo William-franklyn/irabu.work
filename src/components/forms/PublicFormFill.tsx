@@ -1,10 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Wordmark } from "@/components/ui/Logo";
 import type { FormField } from "@/lib/forms/types";
+
+function BrandMark() {
+  return (
+    <Link href="/" aria-label="iRABU home" className="mb-4 inline-flex">
+      <Wordmark size={20} />
+    </Link>
+  );
+}
 
 interface PublicForm {
   id: string;
@@ -55,7 +65,8 @@ export function PublicFormFill({ formId }: { formId: string }) {
 
   if (form === "not_found") {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center text-[var(--muted)]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center text-[var(--muted)]">
+        <BrandMark />
         This form isn&apos;t accepting responses right now.
       </div>
     );
@@ -64,6 +75,7 @@ export function PublicFormFill({ formId }: { formId: string }) {
   if (submitted) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
+        <BrandMark />
         <CheckCircle2 size={32} className="text-[var(--success)]" />
         <p className="text-[var(--text-base)]">Thanks — your response was submitted.</p>
       </div>
@@ -72,6 +84,7 @@ export function PublicFormFill({ formId }: { formId: string }) {
 
   return (
     <div className="mx-auto min-h-screen max-w-lg p-6 py-12">
+      <BrandMark />
       <Card className="p-6">
         <h1 className="text-[var(--text-lg)] font-semibold">{form.title}</h1>
         {form.description && (

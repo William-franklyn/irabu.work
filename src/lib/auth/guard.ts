@@ -24,11 +24,13 @@ export interface AuthContext {
   viewingAs: boolean;
   fullName: string | null;
   memberships: WorkspaceMembership[];
+  canManageAgents: boolean;
 }
 
 type MembershipRow = {
   organization_id: string;
   role: Role;
+  can_manage_agents: boolean;
   organizations: { name: string } | { name: string }[] | null;
 };
 
@@ -61,7 +63,9 @@ async function resolveAuthContext(
   const memberships = membershipRows.map(toMembership);
   const store = await cookies();
   const activeOrgId = store.get(ACTIVE_ORG_COOKIE)?.value;
-  const active = memberships.find((m) => m.orgId === activeOrgId) ?? memberships[0];
+  const activeIndex = membershipRows.findIndex((r) => r.organization_id === activeOrgId);
+  const activeRow = activeIndex >= 0 ? membershipRows[activeIndex] : membershipRows[0];
+  const active = memberships[activeIndex >= 0 ? activeIndex : 0];
 
   const { role, viewingAs } = await resolveViewAsRole(active.role);
 
@@ -74,6 +78,7 @@ async function resolveAuthContext(
     viewingAs,
     fullName,
     memberships,
+    canManageAgents: activeRow.can_manage_agents,
   };
 }
 
@@ -89,7 +94,7 @@ async function loadMemberships(
 
   const { data: rows } = await supabase
     .from("memberships")
-    .select("organization_id, role, organizations(name)")
+    .select("organization_id, role, can_manage_agents, organizations(name)")
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
 

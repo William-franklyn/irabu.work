@@ -9,6 +9,15 @@ function getClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+// The mark is the existing app/icon.svg asset, not a new one — kept in sync
+// with the in-app Wordmark automatically. Some clients (notably Outlook
+// desktop) don't render SVG <img> tags; the "iRABU" text next to it is the
+// fallback, not just a label.
+function emailHeader(): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  return `<div style="margin-bottom:20px;"><img src="${appUrl}/icon.svg" width="20" height="20" alt="iRABU" style="vertical-align:middle;border:0;" /> <strong style="font-size:16px;color:#1a1714;vertical-align:middle;">iRABU</strong></div>`;
+}
+
 interface MeetingEmailParams {
   meetingId: string;
   title: string;
@@ -43,7 +52,7 @@ export async function sendMeetingInvite(params: MeetingEmailParams) {
       from: process.env.RESEND_FROM ?? "iRABU <onboarding@resend.dev>",
       to: params.attendeeEmail,
       subject: `Invitation: ${params.title}`,
-      html: `<p>You've been invited to <strong>${params.title}</strong>.</p><p>${when} · ${params.durationMinutes} minutes</p>${params.notes ? `<p>${params.notes}</p>` : ""}`,
+      html: `${emailHeader()}<p>You've been invited to <strong>${params.title}</strong>.</p><p>${when} · ${params.durationMinutes} minutes</p>${params.notes ? `<p>${params.notes}</p>` : ""}`,
       attachments: [
         {
           filename: "invite.ics",
@@ -83,7 +92,7 @@ export async function sendMeetingCancellation(params: MeetingEmailParams) {
       from: process.env.RESEND_FROM ?? "iRABU <onboarding@resend.dev>",
       to: params.attendeeEmail,
       subject: `Cancelled: ${params.title}`,
-      html: `<p><strong>${params.title}</strong> has been cancelled.</p>`,
+      html: `${emailHeader()}<p><strong>${params.title}</strong> has been cancelled.</p>`,
       attachments: [
         {
           filename: "cancel.ics",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Copy, Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { Bot, Check, Copy, Mail, ShieldCheck, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -11,6 +11,7 @@ interface Member {
   role: "owner" | "admin" | "member";
   persona_verified: boolean;
   sensitive_access_approved: boolean;
+  can_manage_agents: boolean;
 }
 
 interface Invite {
@@ -88,6 +89,18 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
     if (!res.ok) refresh();
   }
 
+  async function toggleAgentsAccess(member: Member) {
+    setMembers((prev) =>
+      prev.map((m) => (m.id === member.id ? { ...m, can_manage_agents: !m.can_manage_agents } : m)),
+    );
+    const res = await fetch(`/api/team/members/${member.id}/agents-permission`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ canManageAgents: !member.can_manage_agents }),
+    });
+    if (!res.ok) refresh();
+  }
+
   return (
     <div>
       <h1 className="text-[var(--text-lg)] font-semibold">Team</h1>
@@ -142,6 +155,24 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
               )}
             </div>
             <div className="flex items-center gap-3">
+              {canManage ? (
+                <button
+                  onClick={() => toggleAgentsAccess(m)}
+                  className={`flex items-center gap-1 text-[var(--text-xs)] ${
+                    m.can_manage_agents ? "text-[var(--accent)]" : "text-[var(--muted)]"
+                  }`}
+                >
+                  <Bot size={12} />
+                  {m.can_manage_agents ? "Agents Lab: granted" : "Grant Agents Lab access"}
+                </button>
+              ) : (
+                m.can_manage_agents && (
+                  <span className="flex items-center gap-1 text-[var(--text-xs)] text-[var(--muted)]">
+                    <Bot size={12} />
+                    Agents Lab access
+                  </span>
+                )
+              )}
               {canManage && m.persona_verified ? (
                 <button
                   onClick={() => toggleSensitiveAccess(m)}

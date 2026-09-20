@@ -154,6 +154,7 @@ function SidebarBody({
   orgName,
   memberships,
   collapsed,
+  canManageAgents,
   onToggleCollapse,
   onNavigate,
 }: {
@@ -161,10 +162,12 @@ function SidebarBody({
   orgName: string;
   memberships: WorkspaceMembership[];
   collapsed: boolean;
+  canManageAgents: boolean;
   onToggleCollapse?: () => void;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const items = navItems.filter((item) => !item.requiresCanManageAgents || canManageAgents);
 
   return (
     <>
@@ -193,7 +196,7 @@ function SidebarBody({
       </div>
 
       <nav className={clsx("mt-6 flex flex-col gap-0.5", collapsed && "w-full items-center")}>
-        {navItems.map((item) => {
+        {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
@@ -224,12 +227,14 @@ export function Sidebar({
   orgId,
   orgName,
   memberships,
+  canManageAgents,
   mobileOpen = false,
   onCloseMobile,
 }: {
   orgId: string;
   orgName: string;
   memberships: WorkspaceMembership[];
+  canManageAgents: boolean;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
 }) {
@@ -275,6 +280,7 @@ export function Sidebar({
           orgName={orgName}
           memberships={memberships}
           collapsed={collapsed}
+          canManageAgents={canManageAgents}
           onToggleCollapse={toggle}
         />
       </aside>
@@ -297,6 +303,7 @@ export function Sidebar({
               orgName={orgName}
               memberships={memberships}
               collapsed={false}
+              canManageAgents={canManageAgents}
               onNavigate={onCloseMobile}
             />
           </aside>

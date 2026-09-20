@@ -809,3 +809,12 @@ export function buildTools(ctx: {
     }),
   };
 }
+
+// The single source of truth for valid tool names — used by Agents Lab's
+// tool-grant Zod schema and builder UI so a hand-synced second list can't
+// drift from this one. Object.keys never invokes a tool's `execute`, so a
+// dummy ctx is safe: only the eager description/inputSchema construction
+// runs, and neither touches ctx.
+export const TOOL_NAMES = Object.keys(
+  buildTools({} as Parameters<typeof buildTools>[0]),
+) as [string, ...string[]];

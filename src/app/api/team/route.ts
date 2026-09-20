@@ -11,7 +11,7 @@ export async function GET() {
   const [{ data: membershipRows }, { data: invites }] = await Promise.all([
     supabase
       .from("memberships")
-      .select("role, sensitive_access_approved, created_at, profiles(id, full_name, persona_verified_at)")
+      .select("role, sensitive_access_approved, can_manage_agents, created_at, profiles(id, full_name, persona_verified_at)")
       .eq("organization_id", auth.orgId)
       .order("created_at"),
     supabase
@@ -30,6 +30,7 @@ export async function GET() {
       role: row.role,
       persona_verified: Boolean(profile?.persona_verified_at),
       sensitive_access_approved: row.sensitive_access_approved,
+      can_manage_agents: row.can_manage_agents,
     };
   });
 
