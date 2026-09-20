@@ -16,7 +16,7 @@ export async function GET() {
       .order("created_at"),
     supabase
       .from("org_invites")
-      .select("id, email, role, token, created_at")
+      .select("id, email, role, grant_agents_access, token, created_at")
       .eq("organization_id", auth.orgId)
       .is("redeemed_at", null)
       .order("created_at", { ascending: false }),

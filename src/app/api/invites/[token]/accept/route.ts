@@ -19,7 +19,7 @@ export async function POST(
 
   const { data: invite } = await admin
     .from("org_invites")
-    .select("id, organization_id, role, redeemed_at")
+    .select("id, organization_id, role, grant_agents_access, redeemed_at")
     .eq("token", token)
     .maybeSingle();
 
@@ -39,10 +39,19 @@ export async function POST(
       user_id: user.id,
       organization_id: invite.organization_id,
       role: invite.role,
+      can_manage_agents: invite.grant_agents_access,
     });
     if (membershipError) {
       return NextResponse.json({ error: "Could not join workspace" }, { status: 500 });
     }
+  } else if (invite.grant_agents_access) {
+    // Upgrade-only: an invite can grant the permission to someone already in
+    // the workspace, never revoke it — that stays a deliberate Team-page
+    // action, not a side effect of redeeming an unrelated invite link.
+    await admin
+      .from("memberships")
+      .update({ can_manage_agents: true })
+      .eq("id", existingMembership.id);
   }
 
   await admin

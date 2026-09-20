@@ -21,7 +21,7 @@ export default async function InvitePage({
   const admin = createAdminClient();
   const { data: invite } = await admin
     .from("org_invites")
-    .select("email, role, message, redeemed_at, organizations(name)")
+    .select("email, role, message, grant_agents_access, redeemed_at, organizations(name)")
     .eq("token", token)
     .maybeSingle();
 
@@ -43,6 +43,7 @@ export default async function InvitePage({
       orgName={org?.name ?? "a workspace"}
       role={invite.role}
       message={invite.message}
+      grantAgentsAccess={invite.grant_agents_access}
     />
   );
 }

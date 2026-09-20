@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2 } from "lucide-react";
+import { Bot, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -11,11 +11,13 @@ export function AcceptInvite({
   orgName,
   role,
   message,
+  grantAgentsAccess,
 }: {
   token: string;
   orgName: string;
   role: string;
   message: string | null;
+  grantAgentsAccess: boolean;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -45,6 +47,12 @@ export function AcceptInvite({
         <p className="mt-1 text-[var(--text-sm)] text-[var(--muted)]">
           You'll be added as {role === "admin" ? "an" : "a"} {role}.
         </p>
+        {grantAgentsAccess && (
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-[var(--text-xs)] text-[var(--accent)]">
+            <Bot size={13} />
+            Includes Agents Lab access
+          </p>
+        )}
         {message && (
           <p className="mt-3 rounded-[var(--radius)] bg-[var(--accent-soft)] p-3 text-[var(--text-sm)]">
             &ldquo;{message}&rdquo;

@@ -18,6 +18,7 @@ interface Invite {
   id: string;
   email: string;
   role: string;
+  grant_agents_access: boolean;
   token: string;
   created_at: string;
 }
@@ -27,6 +28,7 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [grantAgentsAccess, setGrantAgentsAccess] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<string | null>(null);
@@ -54,7 +56,12 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
     const res = await fetch("/api/team/invites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, role: "member", message: message.trim() || undefined }),
+      body: JSON.stringify({
+        email,
+        role: "member",
+        message: message.trim() || undefined,
+        grantAgentsAccess,
+      }),
     });
 
     if (!res.ok) {
@@ -65,6 +72,7 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
       setEmailStatus(body.emailSent ? `Emailed ${email}` : "Invite created — copy the link below to share it");
       setEmail("");
       setMessage("");
+      setGrantAgentsAccess(false);
       refresh();
     }
     setPending(false);
@@ -123,6 +131,17 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
           onChange={(e) => setMessage(e.target.value)}
           className="h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 text-[var(--text-sm)]"
         />
+        {canManage && (
+          <label className="flex items-center gap-1.5 text-[var(--text-xs)] text-[var(--muted)]">
+            <input
+              type="checkbox"
+              checked={grantAgentsAccess}
+              onChange={(e) => setGrantAgentsAccess(e.target.checked)}
+            />
+            <Bot size={13} />
+            Also grant Agents Lab access on acceptance
+          </label>
+        )}
         <Button type="submit" disabled={pending} className="w-fit">
           <UserPlus size={16} />
           Invite
@@ -201,7 +220,18 @@ export function TeamManager({ canManage }: { canManage: boolean }) {
           <div className="mt-2 flex flex-col gap-2">
             {invites.map((invite) => (
               <Card key={invite.id} className="flex items-center justify-between p-3.5">
-                <span className="text-[var(--text-sm)]">{invite.email}</span>
+                <span className="flex items-center gap-1.5 text-[var(--text-sm)]">
+                  {invite.email}
+                  {invite.grant_agents_access && (
+                    <span
+                      title="Grants Agents Lab access on acceptance"
+                      className="flex items-center gap-1 text-[var(--text-xs)] text-[var(--accent)]"
+                    >
+                      <Bot size={12} />
+                      + Agents Lab
+                    </span>
+                  )}
+                </span>
                 <button
                   onClick={() => copyLink(invite)}
                   className="flex items-center gap-1.5 text-[var(--text-xs)] text-[var(--accent)]"

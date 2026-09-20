@@ -10,6 +10,7 @@ const bodySchema = z.object({
   email: z.string().email(),
   role: z.enum(["admin", "member"]).default("member"),
   message: z.string().max(500).optional(),
+  grantAgentsAccess: z.boolean().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,10 +35,11 @@ export async function POST(req: NextRequest) {
       email: parsed.data.email,
       role: parsed.data.role,
       message: parsed.data.message ?? null,
+      grant_agents_access: parsed.data.grantAgentsAccess,
       token,
       created_by: auth.userId,
     })
-    .select("id, email, role, message, token, created_at")
+    .select("id, email, role, message, grant_agents_access, token, created_at")
     .single();
 
   if (error || !data) {
